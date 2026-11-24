@@ -31,8 +31,7 @@ body[data-view=phone] .ct,body[data-view=police] .ph{display:none}
 .sec{font-size:.82rem;color:var(--mut);margin:12px 0 6px}
 .sms{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.88rem}
 .sms a{color:var(--acc);direction:ltr;display:inline-block}
-.sc{display:block;width:100%;text-align:right;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 13px;margin-bottom:8px;font:inherit;color:var(--ink);cursor:pointer}
-.sc small{display:block;color:var(--mut)}
+
 .cnt{font-size:.84rem;color:var(--mut);text-align:center;margin-top:10px}
 .al{position:absolute;inset:0;background:var(--red);color:#fff;padding:24px 20px 20px;display:none;flex-direction:column;z-index:5}
 .al.bc{background:var(--amb)}
@@ -181,8 +180,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--acc)!important;box-sh
 .device-inbox{box-shadow:none}
 .scanbox{border-radius:12px;padding:13px;border-color:var(--line)}
 .scan-btn{margin-top:10px}
-.sc{border-radius:11px;padding:11px 13px;transition:border-color .16s ease,background .16s ease,transform .16s ease}
-.sc:hover{border-color:var(--acc);background:var(--accs);transform:translateY(-1px)}
 .cnt{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-weight:600}
 .ai-panel textarea{min-height:126px}
 .soc-header{align-items:center;padding-bottom:4px}
@@ -280,7 +277,7 @@ function loadMockDatabase(){
   var stored=saved.devices.filter(function(item){return item&&item.id===device.id})[0];
   if(!stored)return device;
   var notifications=Array.isArray(stored.notifications)?stored.notifications.filter(function(item){return item&&typeof item.id==='string'&&typeof item.message==='string'&&typeof item.timestamp==='string'}).slice(0,50).map(function(item){return {id:item.id,message:item.message.slice(0,240),timestamp:item.timestamp,read:item.read===true}}):[];
-  return {id:device.id,name:typeof stored.name==='string'&&stored.name.trim()?stored.name.slice(0,60):device.name,location:DEVICE_REGIONS.indexOf(stored.location)!==-1?stored.location:'غير محددة',enabled:stored.enabled===true,activityCount:Number.isInteger(stored.activityCount)&&stored.activityCount>=0?stored.activityCount:0,stoppedCount:Number.isInteger(stored.stoppedCount)&&stored.stoppedCount>=0?stored.stoppedCount:0,generation:Number.isInteger(stored.generation)&&stored.generation>=0?stored.generation:0,notifications:notifications};
+  return {id:device.id,name:device.name,location:DEVICE_REGIONS.indexOf(stored.location)!==-1?stored.location:'غير محددة',enabled:stored.enabled===true,activityCount:Number.isInteger(stored.activityCount)&&stored.activityCount>=0?stored.activityCount:0,stoppedCount:Number.isInteger(stored.stoppedCount)&&stored.stoppedCount>=0?stored.stoppedCount:0,generation:Number.isInteger(stored.generation)&&stored.generation>=0?stored.generation:0,notifications:notifications};
  });
  restored.reports=saved.reports.filter(function(report){return report&&typeof report==='object'&&restored.devices.some(function(device){return device.id===report.deviceId})});
  restored.broadcasts=Array.isArray(saved.broadcasts)?saved.broadcasts.filter(function(item){return item&&typeof item.message==='string'}).map(function(item){return {timestamp:typeof item.timestamp==='string'?item.timestamp:new Date(0).toISOString(),target:String(item.target||''),message:item.message.slice(0,240),deliveredCount:Number.isInteger(item.deliveredCount)&&item.deliveredCount>=0?item.deliveredCount:0,skippedCount:Number.isInteger(item.skippedCount)&&item.skippedCount>=0?item.skippedCount:0}}):[];
@@ -413,9 +410,9 @@ function setupAiPanel(root,prefix,device){
 
 /* ---------- نسخة الهاتف ---------- */
 function phone(root){
-root.innerHTML='<div class="card device-manager"><h2>إدارة نسخ الهاتف التجريبية</h2><p class="note">خمسة أجهزة محلية مستقلة. تُسجّل الفحوص أو السيناريوهات عند استخدامها فقط. الإعدادات والسجلات محفوظة محلياً في هذا المتصفح.</p><div class="device-settings"><label class="wide">الجهاز المحدد<select class="device-select"></select></label><label>اسم الجهاز<input class="device-name" type="text" maxlength="60"></label><label>المنطقة<select class="device-region"></select></label><button type="button" class="btn device-toggle">تشغيل الجهاز</button><button type="button" class="btn alt device-reset">إعادة ضبط بيانات الجهاز</button><div class="wide note device-status"></div></div><div class="device-history"><h3>سجل نشاط الجهاز المحدد</h3></div></div><div class="device-instances"></div>';
-root.querySelector('.device-manager > .note').textContent='خمسة أجهزة محلية مستقلة. تُسجّل الفحوص أو السيناريوهات عند استخدامها فقط. البيانات مؤقتة في ذاكرة الصفحة ولا تُحفظ بعد إعادة تحميلها.';
-var $=function(selector){return root.querySelector(selector)},select=$('.device-select'),nameInput=$('.device-name'),regionSelect=$('.device-region'),toggle=$('.device-toggle'),reset=$('.device-reset'),host=$('.device-instances'),panels={};
+root.innerHTML='<div class="card device-manager"><h2>إدارة نسخ الهاتف التجريبية</h2><p class="note">خمسة أجهزة محلية مستقلة. تُسجّل الفحوص وتنبيهات الروابط عند استخدامها فقط. الإعدادات والسجلات محفوظة محلياً في هذا المتصفح.</p><div class="device-settings"><label class="wide">الجهاز المحدد<select class="device-select"></select></label><label>المنطقة<select class="device-region"></select></label><button type="button" class="btn device-toggle">تشغيل الجهاز</button><button type="button" class="btn alt device-reset">إعادة ضبط بيانات الجهاز</button><div class="wide note device-status"></div></div><div class="device-history"><h3>سجل نشاط الجهاز المحدد</h3></div></div><div class="device-instances"></div>';
+root.querySelector('.device-manager > .note').textContent='خمسة أجهزة محلية مستقلة. تُسجّل الفحوص وتنبيهات الروابط عند استخدامها فقط. البيانات مؤقتة في ذاكرة الصفحة ولا تُحفظ بعد إعادة تحميلها.';
+var $=function(selector){return root.querySelector(selector)},select=$('.device-select'),regionSelect=$('.device-region'),toggle=$('.device-toggle'),reset=$('.device-reset'),host=$('.device-instances'),panels={};
 DEVICE_REGIONS.forEach(function(region){var option=document.createElement('option');option.value=region;option.textContent=region;regionSelect.appendChild(option)});
 mockDatabase.devices.forEach(function(device){
  var option=document.createElement('option');option.value=device.id;select.appendChild(option);
@@ -426,7 +423,7 @@ function refreshManager(){
  var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0];
  if(!device)return;
  Array.prototype.forEach.call(select.options,function(option){var item=mockDatabase.devices.filter(function(entry){return entry.id===option.value})[0];option.textContent=item.name});
- select.value=device.id;nameInput.value=device.name;regionSelect.value=device.location;
+ select.value=device.id;regionSelect.value=device.location;
  toggle.textContent=device.enabled?'إيقاف الجهاز':'تشغيل الجهاز';
  $('.device-status').textContent=(device.enabled?'الحالة: يعمل محلياً':'الحالة: متوقف')+' · الفحوص المسجلة: '+device.activityCount+' · أُوقفت: '+device.stoppedCount;
  var history=$('.device-history');history.innerHTML='<h3>سجل نشاط الجهاز المحدد</h3>';
@@ -441,7 +438,7 @@ function refreshManager(){
   panel.querySelector('.phone-runtime-status').textContent=item.enabled?'الجهاز يعمل · يمكن إجراء الفحوص':'الجهاز متوقف · يلزم تشغيله من لوحة الإدارة لاستخدامه';
   panel.querySelector('.st b').textContent=item.enabled?'الحماية التجريبية تعمل':'الحماية التجريبية متوقفة';
   panel.querySelector('.st .note').textContent=item.enabled?'تُسجّل نتائج الفحوص في قاعدة بيانات تجريبية محلية.':'يلزم تشغيل النسخة لتفعيل أدوات الفحص.';
-  panel.querySelector('.scanbox + .note').textContent='السيناريوهات التوضيحية محلية ولا ترسل تنبيهات إلى أجهزة أخرى.';
+  panel.querySelector('.scanbox + .note').textContent='الضغط على رابط الرسالة يعرض تنبيهاً على الهاتف ويسجل التفاعل في المركز التجريبي.';
   panel.querySelector('.device-report-count').textContent=item.activityCount;
   panel.renderDeviceNotifications();
   var enabledValue=item.enabled?'true':'false';
@@ -454,11 +451,6 @@ function refreshManager(){
  });
 }
 select.addEventListener('change',function(){selectedId=select.value;refreshManager()});
-nameInput.addEventListener('change',function(){
- var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0],value=nameInput.value.trim();
- device.name=value||DEFAULT_DEVICES.filter(function(item){return item.id===device.id})[0].name;
- notifyMockDatabase();
-});
 regionSelect.addEventListener('change',function(){
  var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0];device.location=regionSelect.value;notifyMockDatabase();
 });
@@ -466,7 +458,7 @@ toggle.addEventListener('click',function(){
  var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0];device.enabled=!device.enabled;notifyMockDatabase();
 });
 reset.addEventListener('click',function(){
- if(!window.confirm('سيتم حذف سجل هذا الجهاز وتنبيهاته وإعادة اسمه ومنطقته وحالته إلى الإعدادات الافتراضية. تأكيد إعادة الضبط؟'))return;
+ if(!window.confirm('سيتم حذف سجل هذا الجهاز وتنبيهاته وإعادة اسمه الافتراضي ومنطقته وحالته إلى الإعدادات الافتراضية. تأكيد إعادة الضبط؟'))return;
  var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0],defaults=DEFAULT_DEVICES.filter(function(item){return item.id===device.id})[0];
  device.name=defaults.name;device.location='غير محددة';device.enabled=false;device.activityCount=0;device.stoppedCount=0;device.generation++;device.notifications=[];
  mockDatabase.reports=mockDatabase.reports.filter(function(report){return report.deviceId!==device.id});
@@ -478,7 +470,7 @@ refreshManager();
 }
 function phoneInstance(root,device){
 var prefix=device.id.replace(/[^A-Za-z0-9]/g,'');
-root.innerHTML='<div class="phone"><div class="sb"><span>٩:٤١</span><span>شبكة ···</span></div><div class="app"><h1>درع الأمان</h1><div class="st"><span class="dot"></span><div><b>الحماية الفورية تعمل</b><div class="note">يُحلّل الرابط عبر محرك درع الأمان المحلي دون فتح الموقع.</div></div></div><div class="sec">رسالة واردة</div><div class="sms">غرامة مرورية غير مسددة. يُرجى سدادها خلال ٢٤ ساعة: <a href="#" class="lk">pay-fines-portal.example/uae</a></div><div class="sec">فحص رابط قبل فتحه</div><div class="scanbox"><label for="urlScanInput">إدخال الرابط للتحليل</label><input id="urlScanInput" type="text" inputmode="url" autocomplete="off" placeholder="https://example.com"><select id="scanSource" aria-label="مصدر الرابط" style="width:100%;margin-top:7px"><option value="message">رسالة أو رابط مباشر</option><option value="search">نتيجة محرك بحث</option><option value="maps">قائمة أو نشاط في الخرائط</option><option value="social">منصة تواصل اجتماعي</option></select><button type="button" class="scan-btn" id="scanUrlBtn">تحليل الرابط</button><div class="scan-status" id="scanStatus" role="status" aria-live="polite"></div></div><div class="note">محاكاة للمكالمات والنسخ وتنبيهات المركز للعرض فقط، وليست مراقبة فعلية للهاتف.</div><div class="sec">تجربة موقف توعوي</div><button class="sc" data-k="link">فتح رابط الرسالة<small>رابط ينتحل بوابة المخالفات</small></button><button class="sc" data-k="call">تحويل مبلغ أثناء مكالمة<small>مكالمة من رقم غير محفوظ منذ ٦ دقائق</small></button><button class="sc" data-k="copy">تحويل إلى رقم حساب منسوخ<small>رقم نُسخ من محادثة قبل ٢٠ ثانية</small></button><div class="cnt">تم الإيقاف: <b class="ns">0</b> · الفحوص المسجلة: <b class="device-report-count">0</b></div></div><div class="al" role="alertdialog" aria-live="assertive"><div class="tp"></div><h2></h2><p class="tx"></p><div class="why"><b>سبب ظهور التنبيه</b><ul></ul></div><div class="sp"></div><button class="b1"></button><button class="b2">متابعة على المسؤولية الشخصية</button></div><div class="toast"></div></div>';
+root.innerHTML='<div class="phone"><div class="sb"><span>٩:٤١</span><span>شبكة ···</span></div><div class="app"><h1>درع الأمان</h1><div class="st"><span class="dot"></span><div><b>الحماية الفورية تعمل</b><div class="note">يُحلّل الرابط عبر محرك درع الأمان المحلي دون فتح الموقع.</div></div></div><div class="sec">رسالة واردة</div><div class="sms">غرامة مرورية غير مسددة. يُرجى سدادها خلال ٢٤ ساعة: <a href="#" class="lk">pay-fines-portal.example/uae</a></div><div class="note">الضغط على رابط الرسالة يعرض تنبيهاً على الهاتف ولا يفتح الموقع.</div><div class="sec">فحص رابط قبل فتحه</div><div class="scanbox"><label for="urlScanInput">إدخال الرابط للتحليل</label><input id="urlScanInput" type="text" inputmode="url" autocomplete="off" placeholder="https://example.com"><select id="scanSource" aria-label="مصدر الرابط" style="width:100%;margin-top:7px"><option value="message">رسالة أو رابط مباشر</option><option value="search">نتيجة محرك بحث</option><option value="maps">قائمة أو نشاط في الخرائط</option><option value="social">منصة تواصل اجتماعي</option></select><button type="button" class="scan-btn" id="scanUrlBtn">تحليل الرابط</button><div class="scan-status" id="scanStatus" role="status" aria-live="polite"></div></div><div class="note">يمكن إدخال رابط يدوياً لتحليله.</div><div class="cnt">تم الإيقاف: <b class="ns">0</b> · الفحوص المسجلة: <b class="device-report-count">0</b></div></div><div class="al" role="alertdialog" aria-live="assertive"><div class="tp"></div><h2></h2><p class="tx"></p><div class="why"><b>سبب ظهور التنبيه</b><ul></ul></div><div class="sp"></div><button class="b1"></button><button class="b2">متابعة على المسؤولية الشخصية</button></div><div class="toast"></div></div>';
 var inputId=prefix+'UrlScanInput',sourceId=prefix+'ScanSource',buttonId=prefix+'ScanUrlBtn',statusId=prefix+'ScanStatus';
 root.querySelector('label[for="urlScanInput"]').setAttribute('for',inputId);
 root.querySelector('#urlScanInput').id=inputId;
@@ -494,9 +486,7 @@ setupAiPanel(root,prefix,device);
 var $=function(s){return root.querySelector(s)},al=$('.al'),go=$('.b2'),ts=$('.toast'),
 ns=device.stoppedCount||0,t,cur;
 var D={
-link:{fp:'9C2E',ty:'click',ti:'رابط احتيالي',tx:'أُوقف فتح الرابط قبل تحميل الصفحة.',rs:['الصفحة تحاكي بوابة الغرامات المرورية','تاريخ تسجيل النطاق حديث','مصدر الرسالة رقم غير معروف'],stop:'إغلاق الرابط',st:'أُغلق الرابط وأُرسلت إشارة مجهولة للمركز'},
-call:{fp:'VOIP',ty:'call',ti:'مكالمة جارية أثناء تحويل مالي',tx:'قد يكون طلب التحويل أثناء المكالمة محاولة احتيال. تم تعليق التحويل في هذا السيناريو.',rs:['مكالمة من رقم غير محفوظ','المبلغ ١٥٬٠٠٠ درهم أعلى من المعتاد','المستفيد جديد'],stop:'إلغاء التحويل',st:'أُلغي التحويل وأُرسلت إشارة مجهولة للمركز'},
-copy:{fp:'ACC7',ty:'copy',ti:'رقم الحساب نُسخ من محادثة',tx:'يُرجى التحقق من هوية صاحب الحساب قبل التحويل.',rs:['نسخ الرقم من تطبيق مراسلة قبل ٢٠ ثانية','الحساب مذكور في بلاغات سابقة','لا توجد تحويلات سابقة لهذا الحساب'],stop:'إيقاف التحويل',st:'أُوقف التحويل وأُرسلت إشارة مجهولة للمركز'}};
+link:{ti:'رابط احتيالي تجريبي',tx:'أُوقف فتح الرابط قبل تحميل الصفحة.',rs:['الرسالة تطلب سداد غرامة خلال ٢٤ ساعة','النطاق pay-fines-portal.example مخصص للأمثلة وليس بوابة حكومية حقيقية','لا تُدخل بيانات أو تُجرِ سداداً عبر الرسالة'],stop:'إغلاق الرابط',st:'تم إيقاف فتح الرابط وتسجيل التنبيه في المركز التجريبي'}};
 function renderDeviceNotifications(){
  var list=$('.device-inbox-list'),notifications=Array.isArray(device.notifications)?device.notifications:[];
  list.innerHTML='';
@@ -533,7 +523,7 @@ function renderScanResult(data){
  if(!(data.indicators||[]).length)addText(card,'p','لم تظهر مؤشرات قوية في الفحوص المتاحة. هذا لا يؤكد أن الرابط آمن.');
  if(data.shortened_url)addText(card,'p','تنبيه: رابط مختصر، والوجهة النهائية لم تُفتح أو تُحلّل تلقائياً.');
  addText(card,'p','رقم الحالة: '+String(data.case_id||'—')+' · '+String(data.analysis_timestamp_utc||''));
- addText(card,'p','سُجّل الدليل الكامل (SHA-256 والتصدير) في مركز العمليات.');
+ addText(card,'p','سُجّل الدليل الكامل SHA-256 والتصدير في مركز العمليات.');
  var caveat=document.createElement('p');caveat.textContent='ملاحظة: لم يتم فتح الموقع. الروابط المختصرة والتحويلات الخارجية قد تحتاج فحصاً إضافياً، وغياب التطابق مع قواعد التهديدات لا يعني أن الرابط آمن.';card.appendChild(caveat);
  scanStatus.innerHTML='';scanStatus.appendChild(card);
 }
@@ -565,15 +555,14 @@ function open(o){
  clearInterval(t);
  if(o.bc){go.style.display='none'}else{go.style.display='block';go.disabled=true;var c=5;go.textContent='متابعة على مسؤوليتي ('+c+')';t=setInterval(function(){c--;if(c<=0){clearInterval(t);go.disabled=false;go.textContent='متابعة على مسؤوليتي'}else go.textContent='متابعة على مسؤوليتي ('+c+')'},1000)}
 }
-function show(k,subject){
+function showLinkWarning(subject){
  if(!device.enabled){toast('يلزم تشغيل الجهاز التجريبي أولاً.');return}
- cur=D[k];
- var report=recordDeviceReport(device,{category:'security',subject:subject||cur.tx,source:'phone_demo_scenario',threatType:'سيناريو توعوي · '+cur.ti,riskLevel:'medium',resultSummary:'بدأ السيناريو التوضيحي',status:'سيناريو توعوي قيد التجربة'});
+ cur=D.link;
+ var report=recordDeviceReport(device,{category:'security',subject:subject||cur.tx,source:'message',threatType:'تنبيه رسالة · '+cur.ti,riskLevel:'medium',resultSummary:'ظهر تنبيه توضيحي لرسالة الغرامة',status:'تم عرض التنبيه على الهاتف'});
  cur.reportId=report.id;
  open({tp:'تنبيه أمني فوري ·',ti:cur.ti,tx:cur.tx,rs:cur.rs,stop:cur.stop});
 }
-root.querySelectorAll('.sc').forEach(function(b){b.onclick=function(){show(b.dataset.k)}});
-root.querySelector('.lk').onclick=function(e){e.preventDefault();show('link',root.querySelector('.lk').textContent)};
+root.querySelector('.lk').onclick=function(e){e.preventDefault();showLinkWarning(root.querySelector('.lk').textContent)};
 $('.b1').onclick=function(){clearInterval(t);al.classList.remove('on');
  ns++;$('.ns').textContent=ns;markReportPrevented(cur.reportId,device);toast(cur.st)};
 go.onclick=function(){if(go.disabled)return;al.classList.remove('on');markReportContinued(cur.reportId,device);toast('تمت متابعة السيناريو وسُجّل ذلك للمراجعة.')};
