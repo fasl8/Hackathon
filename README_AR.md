@@ -62,10 +62,13 @@ pip install -r requirements.txt
 2. Add the required API keys:
 
 ```env
-GEMINI_API_KEY=YOUR_GEMINI_API_KEY
-GEMINI_MODEL=YOUR_GEMINI_MODEL
-GOOGLE_WEB_RISK_API_KEY=YOUR_WEB_RISK_API_KEY
-ENABLE_RDAP=1
+# Keep this key on the Flask server only. Never put it in HTML/JavaScript or Git.
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.8-flash
+# Optional existing threat-intelligence integrations
+GOOGLE_WEB_RISK_API_KEY=
+ENABLE_RDAP=0
+
 ```
 
 Gemini is required for AI content analysis. Google Web Risk and RDAP are optional.
