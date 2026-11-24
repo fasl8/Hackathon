@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>درع الأمان الذكي — محاكاة محلية</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#e9edf0;--card:#fff;--scr:#f7f9fa;--ink:#14212b;--mut:#5b6b78;--line:#d3dae0;--acc:#0e7c86;--accs:#d9eff1;--red:#b3261e;--reds:#fbe1de;--amb:#8a4b08;--ok:#2d7a4b;--oks:#dff1e6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1116;--card:#151f28;--scr:#131d25;--ink:#e6edf2;--mut:#93a4b1;--line:#2b3a46;--acc:#4cc3cd;--accs:#133a40;--red:#c9392f;--reds:#3a1a18;--amb:#a85f10;--ok:#6fd195;--oks:#16331f}}
+:root[data-theme="dark"]{--bg:#0b1116;--card:#151f28;--scr:#131d25;--ink:#e6edf2;--mut:#93a4b1;--line:#2b3a46;--acc:#4cc3cd;--accs:#133a40;--red:#c9392f;--reds:#3a1a18;--amb:#a85f10;--ok:#6fd195;--oks:#16331f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;line-height:1.6}
+nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+nav a{color:var(--ink);text-decoration:none;padding:5px 12px;border-radius:8px;border:1px solid var(--line);font-size:.88rem}
+nav a[aria-current]{background:var(--acc);border-color:var(--acc);color:#fff}
+#chip{margin-inline-start:auto;font-size:.82rem;color:var(--mut)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#app{display:flex;gap:18px;justify-content:center;align-items:flex-start;padding:16px;flex-wrap:wrap}
+#app .ph{flex:0 0 auto}
+#app .ct{flex:1 1 560px;max-width:900px;min-width:0}
+body[data-view=phone] .ct,body[data-view=police] .ph{display:none}
+.phone{width:min(100vw - 32px,390px);height:740px;background:var(--scr);border:8px solid #1c2630;border-radius:40px;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.sb{display:flex;justify-content:space-between;padding:10px 22px 4px;font-size:.78rem;color:var(--mut)}
+.app{flex:1;overflow-y:auto;padding:8px 16px 16px}
+.app h1{font-size:1.1rem;margin:4px 0}
+.st{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 12px;margin:8px 0;font-size:.9rem}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}
+.sec{font-size:.82rem;color:var(--mut);margin:12px 0 6px}
+.sms{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:.88rem}
+.sms a{color:var(--acc);direction:ltr;display:inline-block}
+.sc{display:block;width:100%;text-align:right;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 13px;margin-bottom:8px;font:inherit;color:var(--ink);cursor:pointer}
+.sc small{display:block;color:var(--mut)}
+.cnt{font-size:.84rem;color:var(--mut);text-align:center;margin-top:10px}
+.al{position:absolute;inset:0;background:var(--red);color:#fff;padding:24px 20px 20px;display:none;flex-direction:column;z-index:5}
+.al.bc{background:var(--amb)}
+.al.on{display:flex}
+.al.shake{animation:sh .5s 2}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@media (prefers-reduced-motion:reduce){.al.shake{animation:none}.bar i{transition:none}}
+.al .tp{font-size:.82rem;opacity:.92}
+.al h2{font-size:1.45rem;margin:2px 0 8px;line-height:1.35}
+.al .why{background:rgba(255,255,255,.15);border-radius:12px;padding:10px 12px;margin:6px 0 12px;font-size:.9rem}
+.al ul{margin:6px 0 0;padding-inline-start:20px}
+.al .sp{flex:1}
+.b1{background:#fff;color:#7a1a14;border:0;border-radius:14px;padding:14px;font:inherit;font-weight:700;width:100%;cursor:pointer}
+.b2{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);border-radius:14px;padding:11px;font:inherit;width:100%;margin-top:8px;cursor:pointer}
+.b2:disabled{opacity:.5}
+.toast{position:absolute;bottom:16px;inset-inline:14px;background:#1c2630;color:#fff;border-radius:14px;padding:10px 14px;font-size:.86rem;display:none;z-index:6}
+.toast.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.card h2{font-size:1rem;margin:0 0 8px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:620px){.kp{grid-template-columns:repeat(2,1fr)}}
+.kp b{font-size:1.5rem;display:block;line-height:1.2}
+.kp span{color:var(--mut);font-size:.8rem}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:right;padding:6px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600}
+.tg{padding:1px 9px;border-radius:99px;font-size:.78rem;font-weight:600;background:var(--accs);color:var(--acc)}
+.tg.r{background:var(--reds);color:var(--red)}
+.tg.g{background:var(--oks);color:var(--ok)}
+.feed{height:210px;overflow-y:auto;font-size:.86rem}
+.ev{padding:5px 0;border-bottom:1px dashed var(--line)}
+.ev time{color:var(--mut);font-size:.76rem;margin-inline-end:8px}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn.alt{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select{font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.note{font-size:.8rem;color:var(--mut)}
+.scanbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin:8px 0 12px}
+.scanbox label{display:block;font-size:.82rem;color:var(--mut);margin-bottom:6px}
+.scanbox input{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:var(--scr);color:var(--ink);font:inherit;direction:ltr;text-align:left}
+.scan-btn{width:100%;margin-top:8px;background:var(--acc);color:#fff;border:0;border-radius:9px;padding:10px 12px;font:inherit;font-weight:700;cursor:pointer}
+.scan-btn:disabled{opacity:.6;cursor:wait}
+.scan-status{font-size:.85rem;margin-top:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+.scan-result{border:1px solid var(--line);border-radius:10px;padding:10px 11px;background:var(--scr);margin-top:8px}
+.scan-result.danger{border-color:var(--red);background:var(--reds)}
+.scan-result.ok{border-color:var(--ok);background:var(--oks)}
+.scan-result b{display:block;margin-bottom:4px}
+.scan-result p{margin:4px 0;font-size:.82rem}
+.scan-result ul{margin:5px 0 0;padding-inline-start:20px;font-size:.82rem}
+
+.ai-panel textarea,.ai-panel input{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:var(--scr);color:var(--ink);font:inherit;margin:4px 0 9px}
+.ai-panel textarea{min-height:112px;resize:vertical;direction:rtl;text-align:right}
+.ai-panel input{direction:ltr;text-align:left}
+.ai-panel label{display:block;font-size:.82rem;color:var(--mut);margin-top:5px}
+.ai-panel .ai-result{border:1px solid var(--line);border-radius:10px;background:var(--scr);padding:11px;margin-top:10px}
+.ai-panel .ai-result.high{border-color:var(--red);background:var(--reds)}
+.ai-panel .ai-result.low{border-color:var(--ok);background:var(--oks)}
+.ai-panel .ai-result p{font-size:.86rem;margin:6px 0}
+.ai-panel .ai-result ul{font-size:.84rem;margin:5px 0;padding-inline-start:20px}
+.ai-panel .ai-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.soc-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.soc-header h1{font-size:1.3rem;margin:0}
+.soc-demo{display:inline-flex;align-items:center;border-radius:99px;background:var(--amb);color:#fff;padding:3px 10px;font-size:.78rem;font-weight:700}
+.soc-updated{font-size:.78rem;color:var(--mut)}
+.soc-tabs{display:flex;gap:8px;margin-bottom:12px}
+.soc-tabs button[aria-selected="true"]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.soc-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.soc-controls input,.soc-controls select,.soc-broadcast select,.soc-broadcast textarea{font:inherit;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--scr);color:var(--ink)}
+.soc-controls input{flex:1 1 240px;min-width:0}
+.soc-table-wrap{overflow-x:auto}
+.soc-table{min-width:800px}
+.soc-table td{vertical-align:top}
+.soc-link{direction:ltr;text-align:left;overflow-wrap:anywhere;display:inline-block}
+.soc-campaigns{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:12px}
+.soc-campaign{border:1px solid var(--line);border-radius:9px;padding:10px;background:var(--scr)}
+.soc-campaign b,.soc-campaign span{display:block}
+.soc-campaign span{font-size:.8rem;color:var(--mut)}
+.soc-risk{font-weight:700}
+.soc-risk.critical,.soc-risk.high{color:var(--red)}
+.soc-risk.medium{color:var(--amb)}
+.soc-risk.low{color:var(--ok)}
+.soc-broadcast{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.soc-broadcast label{display:block;font-size:.83rem;color:var(--mut)}
+.soc-broadcast select,.soc-broadcast textarea{width:100%;margin-top:4px}
+.soc-broadcast textarea{min-height:75px;resize:vertical}
+.soc-broadcast .wide{grid-column:1/-1}
+.soc-broadcast-status{padding:9px;border-radius:8px;background:var(--accs);color:var(--ink);font-size:.86rem}
+.device-manager{width:390px;max-width:100%}
+.device-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.device-settings label{display:block;font-size:.83rem;color:var(--mut)}
+.device-settings .wide{grid-column:1/-1}
+.device-settings input,.device-settings select{width:100%;margin-top:4px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--scr);color:var(--ink);font:inherit}
+.device-history{max-height:210px;overflow-y:auto;margin-top:12px}
+.device-history h3{font-size:.9rem;margin:0 0 6px}
+.device-banner{display:grid;gap:2px;background:var(--accs);border-radius:9px;padding:8px 10px;margin:6px 0}
+.device-banner small{color:var(--mut)}
+.device-inbox{padding:10px 12px;margin:8px 0}
+.device-inbox h2{font-size:.92rem;margin:0 0 7px}
+.device-inbox-item{border:1px solid var(--line);border-radius:9px;padding:9px;margin:7px 0;background:var(--scr)}
+.device-inbox-item.unread{border-color:var(--acc);background:var(--accs)}
+.device-inbox-item p{margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.device-inbox-item time{font-size:.75rem;color:var(--mut)}
+.device-inbox-item button{margin-top:5px}
+.phone-instance[hidden]{display:none}
+.soc-devices{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.soc-device-state{font-size:.8rem;color:var(--mut);margin-top:4px}
+.soc-device-state.active{color:var(--ok);font-weight:700}
+@media(max-width:620px){.soc-broadcast{grid-template-columns:1fr}.soc-broadcast .wide{grid-column:auto}.soc-tabs{flex-wrap:wrap}}
+@media(max-width:620px){.device-settings{grid-template-columns:1fr}.device-settings .wide{grid-column:auto}}
+
+/* Formal visual system */
+:root{--bg:#eef3f7;--card:#fff;--scr:#f8fafc;--ink:#172635;--mut:#647789;--line:#d9e2ea;--acc:#126b66;--accs:#e4f2ef;--red:#b42318;--reds:#fff0ee;--amb:#8a5708;--ok:#19734a;--oks:#e8f5ed}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101923;--card:#17232f;--scr:#131e29;--ink:#edf3f8;--mut:#9aabba;--line:#2a3a49;--acc:#48b8ad;--accs:#173b3a;--red:#f27670;--reds:#422423;--amb:#e3aa5e;--ok:#65ce94;--oks:#193d2d}}
+:root[data-theme="dark"]{--bg:#101923;--card:#17232f;--scr:#131e29;--ink:#edf3f8;--mut:#9aabba;--line:#2a3a49;--acc:#48b8ad;--accs:#173b3a;--red:#f27670;--reds:#422423;--amb:#e3aa5e;--ok:#65ce94;--oks:#193d2d}
+body{min-height:100vh;background:radial-gradient(ellipse at 85% 0,rgba(18,107,102,.08),transparent 34rem),var(--bg);font-size:15px}
+nav{position:sticky;top:0;z-index:10;min-height:64px;padding:10px clamp(16px,4vw,48px);background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 4px 18px rgba(20,40,58,.06)}
+nav a{padding:8px 14px;border:1px solid transparent;border-radius:10px;color:var(--mut);font-weight:600;transition:background .18s ease,color .18s ease,border-color .18s ease}
+nav a:hover{background:var(--scr);border-color:var(--line);color:var(--ink)}
+nav a[aria-current]{background:var(--acc);border-color:var(--acc);box-shadow:0 3px 9px rgba(18,107,102,.2);color:#fff}
+#chip{padding:6px 11px;border:1px solid var(--line);border-radius:999px;background:var(--scr);font-size:.78rem}
+#app{max-width:1540px;margin:0 auto;gap:22px;padding:24px clamp(14px,3vw,34px) 36px}
+#app .ct{flex-basis:620px}
+.card{border-color:var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px;box-shadow:0 8px 24px rgba(22,42,60,.055)}
+.card h2{font-size:1.04rem;line-height:1.5;font-weight:700}
+h1,h2,h3{color:var(--ink);letter-spacing:-.015em}
+.note{line-height:1.7}
+.device-manager{padding:18px}
+.device-manager h2{margin-bottom:5px}
+.device-settings{gap:12px;margin-top:16px}
+.device-settings label,.soc-broadcast label{font-weight:600}
+.device-settings input,.device-settings select,.soc-controls input,.soc-controls select,.soc-broadcast select,.soc-broadcast textarea,.ai-panel textarea,.ai-panel input,.scanbox input{min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--scr);transition:border-color .18s ease,box-shadow .18s ease}
+.device-settings input,.device-settings select{padding:9px 11px}
+input:focus,select:focus,textarea:focus{border-color:var(--acc)!important;box-shadow:0 0 0 3px rgba(18,107,102,.13);outline:0}
+.btn,.scan-btn{min-height:42px;border-radius:10px;font-weight:700;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+.btn:hover,.scan-btn:hover:not(:disabled){box-shadow:0 4px 12px rgba(18,107,102,.18);transform:translateY(-1px)}
+.btn:active,.scan-btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled,.scan-btn:disabled{cursor:not-allowed;opacity:.55;box-shadow:none;transform:none}
+.btn.alt{background:var(--card)}
+.phone{border:7px solid #152431;border-radius:36px;background:var(--scr);box-shadow:0 18px 38px rgba(12,28,42,.18)}
+.sb{padding-top:12px;font-weight:600}
+.app{padding:12px 16px 20px;scrollbar-color:var(--line) transparent;scrollbar-width:thin}
+.app h1{font-size:1.18rem;font-weight:700;margin:5px 0 10px}
+.st{border-radius:12px;padding:11px 12px;box-shadow:0 3px 10px rgba(20,40,58,.035)}
+.sec{font-weight:700;font-size:.82rem;margin-top:17px}
+.device-banner{border:1px solid var(--line);border-radius:11px;background:var(--accs);padding:10px 12px}
+.device-inbox{box-shadow:none}
+.scanbox{border-radius:12px;padding:13px;border-color:var(--line)}
+.scan-btn{margin-top:10px}
+.sc{border-radius:11px;padding:11px 13px;transition:border-color .16s ease,background .16s ease,transform .16s ease}
+.sc:hover{border-color:var(--acc);background:var(--accs);transform:translateY(-1px)}
+.cnt{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-weight:600}
+.ai-panel textarea{min-height:126px}
+.soc-header{align-items:center;padding-bottom:4px}
+.soc-header h1{font-size:1.4rem;font-weight:700}
+.soc-demo{background:var(--accs);color:var(--acc);border:1px solid var(--line);padding:5px 11px}
+.soc-updated{margin-top:7px}
+.kp{gap:12px}
+.kp>div{min-width:0;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--scr)}
+.kp b{font-size:1.65rem;color:var(--acc);margin-bottom:5px}
+.kp span{display:block;line-height:1.5}
+.soc-campaign{border-radius:12px;padding:13px 14px;background:var(--scr);transition:border-color .18s ease,transform .18s ease}
+.soc-campaign:hover{border-color:var(--acc);transform:translateY(-1px)}
+.soc-campaign b{margin-bottom:4px}
+.soc-device-state{display:inline-flex!important;width:max-content;max-width:100%;padding:2px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+.soc-device-state.active{border-color:var(--ok);background:var(--oks)}
+.soc-tabs{gap:9px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.soc-tabs .btn{min-width:145px}
+.soc-controls{gap:9px}
+.soc-controls input,.soc-controls select{min-height:42px}
+.soc-table{min-width:840px}
+.soc-table th{padding:10px 9px;background:var(--scr);font-weight:700}
+.soc-table td{padding:10px 9px;line-height:1.55}
+.soc-table tbody tr:hover{background:var(--scr)}
+.soc-risk{font-size:.86rem}
+.soc-broadcast{gap:13px}
+.soc-broadcast-status{border:1px solid var(--line);border-radius:10px}
+.device-history{border-top:1px solid var(--line);padding-top:12px}
+.ev{padding:8px 2px;line-height:1.55}
+@media(max-width:760px){
+ nav{gap:6px;padding:9px 12px}
+ nav a{padding:7px 10px;font-size:.82rem}
+ #chip{flex:1 0 100%;margin:2px 0 0;text-align:center}
+ #app{gap:16px;padding:16px 12px 26px}
+ #app .ph,#app .ct{flex:1 1 100%;max-width:100%}
+ .device-manager{width:100%}
+ .phone{width:min(100%,390px);margin-inline:auto}
+ .soc-header h1{font-size:1.22rem}
+ .kp{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:420px){
+ .card{padding:15px}
+ .kp>div{padding:11px}
+ .soc-tabs .btn{flex:1;min-width:0;padding-inline:9px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body data-view="demo">
+<nav><a href="#demo">عرض مزدوج</a><a href="#phone">نسخة الهاتف</a><a href="#police">نسخة الكمبيوتر (المركز)</a><span id="chip">…</span></nav>
+<div id="app"><div class="ph" id="ph"></div><div class="ct" id="ct"></div></div>
+
+<script>
+(function(){
+var view=(location.hash||'#demo').slice(1);
+if(!/^(demo|phone|police)$/.test(view))view='demo';
+document.body.dataset.view=view;
+document.querySelectorAll('nav a').forEach(function(a){if(a.getAttribute('href')==='#'+view)a.setAttribute('aria-current','page')});
+window.addEventListener('hashchange',function(){location.reload()});
+
+var chip=document.getElementById('chip');
+chip.textContent='سجلات مؤقتة للجلسة · لا اتصال بأجهزة حقيقية';
+
+/* ---------- Mock Database: local browser storage, no remote device connection ---------- */
+var MOCK_DB_KEY='scamshield_phone_instances_v1';
+var DEVICE_REGIONS=['غير محددة','أبوظبي','دبي','الشارقة','العين','عجمان','الفجيرة','رأس الخيمة','أم القيوين'];
+var DEFAULT_DEVICES=[
+ {id:'DEMO-PHONE-01',name:'هاتف تجريبي 1'},
+ {id:'DEMO-PHONE-02',name:'هاتف تجريبي 2'},
+ {id:'DEMO-PHONE-03',name:'هاتف تجريبي 3'},
+ {id:'DEMO-PHONE-04',name:'هاتف تجريبي 4'},
+ {id:'DEMO-PHONE-05',name:'هاتف تجريبي 5'}
+];
+var mockDbListeners=[],mockStorageAvailable=true;
+function freshMockDatabase(){
+ return {version:1,nextReport:1,nextNotification:1,devices:DEFAULT_DEVICES.map(function(device){return {id:device.id,name:device.name,location:'غير محددة',enabled:false,activityCount:0,stoppedCount:0,generation:0,notifications:[]}}),reports:[],broadcasts:[]};
+}
+function mockStorageWarning(message,error){
+ mockStorageAvailable=false;chip.textContent=message;
+ if(error)console.error('Mock database storage error',error);
+}
+function loadMockDatabase(){
+ var raw;
+ try{raw=window.localStorage.getItem(MOCK_DB_KEY)}catch(error){mockStorageWarning('بيانات مؤقتة لهذه الجلسة فقط · التخزين المحلي غير متاح',error);return freshMockDatabase()}
+ if(!raw)return freshMockDatabase();
+ var saved;
+ try{saved=JSON.parse(raw)}catch(error){mockStorageWarning('تعذرت قراءة قاعدة البيانات التجريبية · بدأت جلسة مؤقتة جديدة',error);return freshMockDatabase()}
+ if(!saved||saved.version!==1||!Array.isArray(saved.devices)||!Array.isArray(saved.reports)){
+  mockStorageWarning('بيانات قاعدة البيانات التجريبية غير صالحة · بدأت جلسة مؤقتة جديدة');
+  return freshMockDatabase();
+ }
+ var restored=freshMockDatabase();
+ restored.nextReport=Number.isInteger(saved.nextReport)&&saved.nextReport>0?saved.nextReport:1;
+ restored.nextNotification=Number.isInteger(saved.nextNotification)&&saved.nextNotification>0?saved.nextNotification:1;
+ restored.devices=restored.devices.map(function(device){
+  var stored=saved.devices.filter(function(item){return item&&item.id===device.id})[0];
+  if(!stored)return device;
+  var notifications=Array.isArray(stored.notifications)?stored.notifications.filter(function(item){return item&&typeof item.id==='string'&&typeof item.message==='string'&&typeof item.timestamp==='string'}).slice(0,50).map(function(item){return {id:item.id,message:item.message.slice(0,240),timestamp:item.timestamp,read:item.read===true}}):[];
+  return {id:device.id,name:typeof stored.name==='string'&&stored.name.trim()?stored.name.slice(0,60):device.name,location:DEVICE_REGIONS.indexOf(stored.location)!==-1?stored.location:'غير محددة',enabled:stored.enabled===true,activityCount:Number.isInteger(stored.activityCount)&&stored.activityCount>=0?stored.activityCount:0,stoppedCount:Number.isInteger(stored.stoppedCount)&&stored.stoppedCount>=0?stored.stoppedCount:0,generation:Number.isInteger(stored.generation)&&stored.generation>=0?stored.generation:0,notifications:notifications};
+ });
+ restored.reports=saved.reports.filter(function(report){return report&&typeof report==='object'&&restored.devices.some(function(device){return device.id===report.deviceId})});
+ restored.broadcasts=Array.isArray(saved.broadcasts)?saved.broadcasts.filter(function(item){return item&&typeof item.message==='string'}).map(function(item){return {timestamp:typeof item.timestamp==='string'?item.timestamp:new Date(0).toISOString(),target:String(item.target||''),message:item.message.slice(0,240),deliveredCount:Number.isInteger(item.deliveredCount)&&item.deliveredCount>=0?item.deliveredCount:0,skippedCount:Number.isInteger(item.skippedCount)&&item.skippedCount>=0?item.skippedCount:0}}):[];
+ return restored;
+ return freshMockDatabase();
+}
+var mockDatabase=loadMockDatabase();
+function saveMockDatabase(){
+ if(!mockStorageAvailable)return;
+ try{window.localStorage.setItem(MOCK_DB_KEY,JSON.stringify(mockDatabase))}
+ catch(error){mockStorageWarning('بيانات مؤقتة لهذه الجلسة فقط · تعذر حفظ قاعدة البيانات التجريبية',error)}
+}
+function notifyMockDatabase(){
+ saveMockDatabase();
+ mockDbListeners.slice().forEach(function(listener){listener(mockDatabase)});
+}
+function subscribeMockDatabase(listener){mockDbListeners.push(listener)}
+function recordDeviceReport(device,details,deferNotification){
+ var report={
+  id:'MOCK-CASE-'+String(mockDatabase.nextReport).padStart(5,'0'),
+  deviceId:device.id,deviceName:String(details.deviceName||device.name),location:String(details.location||device.location),
+  category:details.category==='suspicious'?'suspicious':'security',
+  subject:String(details.subject||''),source:String(details.source||'other'),
+  threatType:String(details.threatType||'نتيجة فحص'),
+  riskLevel:details.riskLevel==='uncertain'?'unknown':String(details.riskLevel||'unknown'),
+  riskScore:Number.isFinite(Number(details.riskScore))?Number(details.riskScore):null,
+  resultSummary:String(details.resultSummary||''),
+  status:String(details.status||'اكتمل الفحص'),
+  responseSeconds:Number.isFinite(Number(details.responseSeconds))?Number(details.responseSeconds):null,
+  autoWarning:details.autoWarning===true,
+  prevented:false,
+  evidenceSha256:String(details.evidenceSha256||''),
+  evidence:details.evidence||null,
+  evidenceType:String(details.evidenceType||'csv'),
+  discoveredAt:new Date().toISOString()
+ };
+ mockDatabase.nextReport++;
+ mockDatabase.reports.unshift(report);
+ device.activityCount++;
+ if(!deferNotification)notifyMockDatabase();
+ return report;
+}
+function markReportPrevented(reportId,device){
+ var report=mockDatabase.reports.filter(function(item){return item.id===reportId&&item.deviceId===device.id})[0];
+ if(report&&!report.prevented){report.prevented=true;device.stoppedCount++;notifyMockDatabase()}
+}
+function markReportContinued(reportId,device){
+ var report=mockDatabase.reports.filter(function(item){return item.id===reportId&&item.deviceId===device.id})[0];
+ if(report&&!report.prevented){report.status='تمت متابعة السيناريو التوضيحي';notifyMockDatabase()}
+}
+function exportCsvResults(results){
+ fetch('/api/export/csv',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({results:results})})
+ .then(function(r){if(!r.ok)throw new Error('تعذر تجهيز التقرير');return r.blob()})
+ .then(function(blob){var a=document.createElement('a'),u=URL.createObjectURL(blob);a.href=u;a.download='scamshield_evidence.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u)})
+ .catch(function(e){alert(e.message)});
+}
+
+function exportJsonData(data,filename){
+ var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=u;a.download=filename||'scamshield_report.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(u);
+}
+
+/* ---------- محلل المحتوى بالذكاء الاصطناعي (Gemini API) ---------- */
+function aiPanelHtml(prefix){
+ return '<div class="card ai-panel"><h2>تحليل المحتوى بالذكاء الاصطناعي</h2>'+
+ '<p class="note">يحلل نموذج جيميني نص الرسالة أو الإعلان أو محتوى الصفحة باللغتين العربية والإنجليزية. يمكن إدخال النص هنا؛ ولا يفتح التطبيق الرابط تلقائياً.</p>'+
+ '<label for="'+prefix+'AiText">نص الرسالة أو الصفحة أو الإعلان</label>'+
+ '<textarea id="'+prefix+'AiText" maxlength="7000" placeholder="مثال: تم إيقاف حسابك... يرجى إدخال رمز التحقق خلال 24 ساعة"></textarea>'+
+ '<label for="'+prefix+'AiUrl">الرابط المرتبط (اختياري)</label>'+
+ '<input id="'+prefix+'AiUrl" type="text" maxlength="2048" placeholder="https://example.com">'+
+ '<label for="'+prefix+'AiSource">نوع المحتوى</label>'+
+ '<select id="'+prefix+'AiSource" style="width:100%;margin:4px 0 8px"><option value="message">رسالة نصية أو بريد</option><option value="webpage">محتوى صفحة موقع</option><option value="search_ad">إعلان أو نتيجة بحث</option><option value="maps_listing">وصف نشاط أو إعلان في الخرائط</option><option value="other">محتوى آخر</option></select>'+
+ '<button type="button" class="btn ai-analyze-btn" id="'+prefix+'AiButton">تحليل بالذكاء الاصطناعي</button>'+
+ '<div class="scan-status ai-status" id="'+prefix+'AiStatus" role="status" aria-live="polite"></div>'+
+ '<p class="note">النتيجة تقدير أولي من نموذج الذكاء الاصطناعي، وليست احتمالاً إحصائياً أو حكماً نهائياً. يُرجى عدم إدخال معلومات شخصية أو رموز تحقق حقيقية.</p></div>';
+}
+function setupAiPanel(root,prefix,device){
+ var textBox=root.querySelector('#'+prefix+'AiText');
+ var urlBox=root.querySelector('#'+prefix+'AiUrl');
+ var sourceBox=root.querySelector('#'+prefix+'AiSource');
+ var button=root.querySelector('#'+prefix+'AiButton');
+ var status=root.querySelector('#'+prefix+'AiStatus');
+ if(!textBox||!urlBox||!sourceBox||!button||!status)return;
+ function safeText(parent,tag,value){var el=document.createElement(tag);el.textContent=String(value||'');parent.appendChild(el);return el}
+ function showResult(data){
+  var a=data.analysis||{};
+  var level=String(a.risk_level||'uncertain');
+  var card=document.createElement('div');card.className='ai-result '+(level==='high'?'high':level==='low'?'low':'');
+  var assessment={likely_scam:'اشتباه قوي في احتيال',suspicious:'محتوى مشبوه',no_clear_scam_signals:'لم تظهر مؤشرات احتيال واضحة',uncertain:'النتيجة غير حاسمة'};
+  var levels={high:'مرتفع',medium:'متوسط',low:'منخفض',uncertain:'غير محسوم'};
+  var types={credential_theft:'سرقة بيانات الدخول',payment_fraud:'احتيال دفع أو تحويل',impersonation:'انتحال جهة أو علامة تجارية',fake_support:'دعم فني أو رقم مساعدة وهمي',investment_scam:'احتيال استثماري',malware_delivery:'توزيع برمجيات ضارة',other:'نوع آخر',unknown:'غير معروف'};
+  safeText(card,'b','تقييم الذكاء الاصطناعي: '+(assessment[a.assessment]||assessment.uncertain));
+  safeText(card,'p','مستوى الاشتباه: '+(levels[level]||levels.uncertain)+' · النوع: '+(types[a.scam_type]||'غير محدد'));
+  var languageLabels={Arabic:'العربية',English:'الإنجليزية',Mixed:'مختلطة',Other:'أخرى'};
+  safeText(card,'p','لغة المحتوى: '+(languageLabels[a.language]||'غير محددة')+' · المحرك: جيميني');
+  if(a.impersonated_brand)safeText(card,'p','العلامة التي قد تكون مستهدفة: '+a.impersonated_brand+' (تقدير الذكاء الاصطناعي غير موثق بحد ذاته)');
+  safeText(card,'p',a.summary_ar||'لا يتوفر ملخص باللغة العربية.');
+  if((a.red_flags||[]).length){safeText(card,'b','مؤشرات الاحتيال');var flags=document.createElement('ul');a.red_flags.forEach(function(x){safeText(flags,'li',x)});card.appendChild(flags)}
+  if((a.evidence_quotes||[]).length){safeText(card,'b','عبارات مقتبسة من النص المرسل');var quotes=document.createElement('ul');a.evidence_quotes.forEach(function(x){safeText(quotes,'li','«'+x+'»')});card.appendChild(quotes)}
+  if((a.sensitive_requests||[]).length){safeText(card,'b','طلبات حساسة');var reqs=document.createElement('ul');a.sensitive_requests.forEach(function(x){safeText(reqs,'li',x)});card.appendChild(reqs)}
+  if(a.recommended_action_ar)safeText(card,'p','التوصية: '+a.recommended_action_ar);
+  safeText(card,'p',data.disclaimer_ar||'تحليل مساعد وليس حكماً نهائياً.');
+  safeText(card,'p','سُجّل التحليل الكامل في مركز العمليات.');
+  status.innerHTML='';status.appendChild(card);
+ }
+ function run(){
+  if(device&&!device.enabled){status.textContent='يلزم تشغيل الجهاز التجريبي أولاً.';return}
+  var text=textBox.value.trim();if(text.length<8){status.textContent='يُرجى إدخال نص أطول للتحليل.';return}
+  var startedAt=Date.now(),generation=device?device.generation:0,deviceName=device&&device.name,location=device&&device.location;
+  button.disabled=true;button.textContent='جارٍ تحليل المحتوى…';status.textContent='جارٍ إرسال النص إلى خدمة الذكاء الاصطناعي.';
+  fetch('/api/ai/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,context_url:urlBox.value.trim(),source:sourceBox.value})})
+   .then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.message_ar||d.error||'تعذر تحليل المحتوى');return d})})
+   .then(function(data){
+    if(device&&generation!==device.generation){status.textContent='أُلغيت النتيجة بعد إعادة ضبط الجهاز.';return}
+    showResult(data);
+    if(device){
+     var analysis=data.analysis||{},level=String(analysis.risk_level||'uncertain'),assessment=String(analysis.assessment||''),types={credential_theft:'سرقة بيانات الدخول',payment_fraud:'احتيال دفع أو تحويل',impersonation:'انتحال جهة أو علامة',fake_support:'دعم فني وهمي',investment_scam:'احتيال استثماري',malware_delivery:'توزيع برمجيات ضارة'};
+     recordDeviceReport(device,{category:assessment==='likely_scam'||assessment==='suspicious'||level==='high'||level==='critical'?'suspicious':'security',subject:text+(urlBox.value.trim()?'\n'+urlBox.value.trim():''),source:'ai_'+sourceBox.value,threatType:'تحليل الذكاء الاصطناعي · '+(types[analysis.scam_type]||'محتوى'),riskLevel:level,resultSummary:String(analysis.summary_ar||'اكتمل تحليل المحتوى'),status:'اكتمل التحليل بالذكاء الاصطناعي',evidence:data,evidenceType:'ai_json',responseSeconds:(Date.now()-startedAt)/1000,autoWarning:assessment==='likely_scam'||level==='high'||level==='critical',deviceName:deviceName,location:location});
+    }
+   })
+   .catch(function(e){
+    if(device&&generation!==device.generation){status.textContent='أُلغيت النتيجة بعد إعادة ضبط الجهاز.';return}
+    status.textContent='تعذر تحليل المحتوى بالذكاء الاصطناعي: '+e.message;
+    if(device)recordDeviceReport(device,{category:'security',subject:text+(urlBox.value.trim()?'\n'+urlBox.value.trim():''),source:'ai_'+sourceBox.value,threatType:'محاولة تحليل محتوى',riskLevel:'unknown',resultSummary:e.message,status:'تعذر إكمال التحليل',responseSeconds:(Date.now()-startedAt)/1000,deviceName:deviceName,location:location});
+   })
+   .finally(function(){button.disabled=!!(device&&!device.enabled);button.textContent='تحليل بالذكاء الاصطناعي'});
+ }
+ button.addEventListener('click',run);
+}
+
+/* ---------- نسخة الهاتف ---------- */
+function phone(root){
+root.innerHTML='<div class="card device-manager"><h2>إدارة نسخ الهاتف التجريبية</h2><p class="note">خمسة أجهزة محلية مستقلة. تُسجّل الفحوص أو السيناريوهات عند استخدامها فقط. الإعدادات والسجلات محفوظة محلياً في هذا المتصفح.</p><div class="device-settings"><label class="wide">الجهاز المحدد<select class="device-select"></select></label><label>اسم الجهاز<input class="device-name" type="text" maxlength="60"></label><label>المنطقة<select class="device-region"></select></label><button type="button" class="btn device-toggle">تشغيل الجهاز</button><button type="button" class="btn alt device-reset">إعادة ضبط بيانات الجهاز</button><div class="wide note device-status"></div></div><div class="device-history"><h3>سجل نشاط الجهاز المحدد</h3></div></div><div class="device-instances"></div>';
+root.querySelector('.device-manager > .note').textContent='خمسة أجهزة محلية مستقلة. تُسجّل الفحوص أو السيناريوهات عند استخدامها فقط. البيانات مؤقتة في ذاكرة الصفحة ولا تُحفظ بعد إعادة تحميلها.';
+var $=function(selector){return root.querySelector(selector)},select=$('.device-select'),nameInput=$('.device-name'),regionSelect=$('.device-region'),toggle=$('.device-toggle'),reset=$('.device-reset'),host=$('.device-instances'),panels={};
+DEVICE_REGIONS.forEach(function(region){var option=document.createElement('option');option.value=region;option.textContent=region;regionSelect.appendChild(option)});
+mockDatabase.devices.forEach(function(device){
+ var option=document.createElement('option');option.value=device.id;select.appendChild(option);
+ var panel=document.createElement('div');panel.className='phone-instance';panel.hidden=true;host.appendChild(panel);panels[device.id]=panel;phoneInstance(panel,device);
+});
+var selectedId=mockDatabase.devices[0].id;
+function refreshManager(){
+ var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0];
+ if(!device)return;
+ Array.prototype.forEach.call(select.options,function(option){var item=mockDatabase.devices.filter(function(entry){return entry.id===option.value})[0];option.textContent=item.name});
+ select.value=device.id;nameInput.value=device.name;regionSelect.value=device.location;
+ toggle.textContent=device.enabled?'إيقاف الجهاز':'تشغيل الجهاز';
+ $('.device-status').textContent=(device.enabled?'الحالة: يعمل محلياً':'الحالة: متوقف')+' · الفحوص المسجلة: '+device.activityCount+' · أُوقفت: '+device.stoppedCount;
+ var history=$('.device-history');history.innerHTML='<h3>سجل نشاط الجهاز المحدد</h3>';
+ var entries=mockDatabase.reports.filter(function(report){return report.deviceId===device.id}).slice(0,8);
+ if(!entries.length){var empty=document.createElement('p');empty.className='note';empty.textContent='لا يوجد نشاط مسجل لهذا الجهاز.';history.appendChild(empty)}
+ entries.forEach(function(report){var entry=document.createElement('div');entry.className='ev';entry.textContent=new Date(report.discoveredAt).toLocaleString('ar-AE',{hour12:false})+' · '+report.threatType+' · '+report.subject;history.appendChild(entry)});
+ mockDatabase.devices.forEach(function(item){
+  var panel=panels[item.id],isSelected=item.id===selectedId;
+  panel.hidden=!isSelected;
+  panel.querySelector('.phone-device-name').textContent=item.name;
+  panel.querySelector('.phone-device-location').textContent='المنطقة: '+item.location;
+  panel.querySelector('.phone-runtime-status').textContent=item.enabled?'الجهاز يعمل · يمكن إجراء الفحوص':'الجهاز متوقف · يلزم تشغيله من لوحة الإدارة لاستخدامه';
+  panel.querySelector('.st b').textContent=item.enabled?'الحماية التجريبية تعمل':'الحماية التجريبية متوقفة';
+  panel.querySelector('.st .note').textContent=item.enabled?'تُسجّل نتائج الفحوص في قاعدة بيانات تجريبية محلية.':'يلزم تشغيل النسخة لتفعيل أدوات الفحص.';
+  panel.querySelector('.scanbox + .note').textContent='السيناريوهات التوضيحية محلية ولا ترسل تنبيهات إلى أجهزة أخرى.';
+  panel.querySelector('.device-report-count').textContent=item.activityCount;
+  panel.renderDeviceNotifications();
+  var enabledValue=item.enabled?'true':'false';
+  if(panel.dataset.deviceEnabled!==enabledValue){
+   panel.querySelectorAll('.app input,.app select,.app textarea,.app button').forEach(function(control){control.disabled=!item.enabled});
+   panel.querySelectorAll('.b1,.b2').forEach(function(control){control.disabled=!item.enabled});
+   if(!item.enabled)panel.stopPhoneAlert();
+   panel.dataset.deviceEnabled=enabledValue;
+  }
+ });
+}
+select.addEventListener('change',function(){selectedId=select.value;refreshManager()});
+nameInput.addEventListener('change',function(){
+ var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0],value=nameInput.value.trim();
+ device.name=value||DEFAULT_DEVICES.filter(function(item){return item.id===device.id})[0].name;
+ notifyMockDatabase();
+});
+regionSelect.addEventListener('change',function(){
+ var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0];device.location=regionSelect.value;notifyMockDatabase();
+});
+toggle.addEventListener('click',function(){
+ var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0];device.enabled=!device.enabled;notifyMockDatabase();
+});
+reset.addEventListener('click',function(){
+ if(!window.confirm('سيتم حذف سجل هذا الجهاز وتنبيهاته وإعادة اسمه ومنطقته وحالته إلى الإعدادات الافتراضية. تأكيد إعادة الضبط؟'))return;
+ var device=mockDatabase.devices.filter(function(item){return item.id===selectedId})[0],defaults=DEFAULT_DEVICES.filter(function(item){return item.id===device.id})[0];
+ device.name=defaults.name;device.location='غير محددة';device.enabled=false;device.activityCount=0;device.stoppedCount=0;device.generation++;device.notifications=[];
+ mockDatabase.reports=mockDatabase.reports.filter(function(report){return report.deviceId!==device.id});
+ panels[device.id].resetPhoneData();
+ notifyMockDatabase();
+});
+subscribeMockDatabase(refreshManager);
+refreshManager();
+}
+function phoneInstance(root,device){
+var prefix=device.id.replace(/[^A-Za-z0-9]/g,'');
+root.innerHTML='<div class="phone"><div class="sb"><span>٩:٤١</span><span>شبكة ···</span></div><div class="app"><h1>درع الأمان</h1><div class="st"><span class="dot"></span><div><b>الحماية الفورية تعمل</b><div class="note">يُحلّل الرابط عبر محرك درع الأمان المحلي دون فتح الموقع.</div></div></div><div class="sec">رسالة واردة</div><div class="sms">غرامة مرورية غير مسددة. يُرجى سدادها خلال ٢٤ ساعة: <a href="#" class="lk">pay-fines-portal.example/uae</a></div><div class="sec">فحص رابط قبل فتحه</div><div class="scanbox"><label for="urlScanInput">إدخال الرابط للتحليل</label><input id="urlScanInput" type="text" inputmode="url" autocomplete="off" placeholder="https://example.com"><select id="scanSource" aria-label="مصدر الرابط" style="width:100%;margin-top:7px"><option value="message">رسالة أو رابط مباشر</option><option value="search">نتيجة محرك بحث</option><option value="maps">قائمة أو نشاط في الخرائط</option><option value="social">منصة تواصل اجتماعي</option></select><button type="button" class="scan-btn" id="scanUrlBtn">تحليل الرابط</button><div class="scan-status" id="scanStatus" role="status" aria-live="polite"></div></div><div class="note">محاكاة للمكالمات والنسخ وتنبيهات المركز للعرض فقط، وليست مراقبة فعلية للهاتف.</div><div class="sec">تجربة موقف توعوي</div><button class="sc" data-k="link">فتح رابط الرسالة<small>رابط ينتحل بوابة المخالفات</small></button><button class="sc" data-k="call">تحويل مبلغ أثناء مكالمة<small>مكالمة من رقم غير محفوظ منذ ٦ دقائق</small></button><button class="sc" data-k="copy">تحويل إلى رقم حساب منسوخ<small>رقم نُسخ من محادثة قبل ٢٠ ثانية</small></button><div class="cnt">تم الإيقاف: <b class="ns">0</b> · الفحوص المسجلة: <b class="device-report-count">0</b></div></div><div class="al" role="alertdialog" aria-live="assertive"><div class="tp"></div><h2></h2><p class="tx"></p><div class="why"><b>سبب ظهور التنبيه</b><ul></ul></div><div class="sp"></div><button class="b1"></button><button class="b2">متابعة على المسؤولية الشخصية</button></div><div class="toast"></div></div>';
+var inputId=prefix+'UrlScanInput',sourceId=prefix+'ScanSource',buttonId=prefix+'ScanUrlBtn',statusId=prefix+'ScanStatus';
+root.querySelector('label[for="urlScanInput"]').setAttribute('for',inputId);
+root.querySelector('#urlScanInput').id=inputId;
+root.querySelector('#scanSource').id=sourceId;
+root.querySelector('#scanUrlBtn').id=buttonId;
+root.querySelector('#scanStatus').id=statusId;
+root.querySelector('.cnt').innerHTML='تم الإيقاف: <b class="ns">0</b> · الفحوص المسجلة: <b class="device-report-count">0</b>';
+root.querySelector('.app h1').insertAdjacentHTML('afterend','<div class="device-banner"><b class="phone-device-name"></b><span class="phone-device-location"></span><small class="phone-runtime-status"></small></div>');
+root.querySelector('.device-banner').insertAdjacentHTML('afterend','<section class="card device-inbox" aria-label="تنبيهات مركز العمليات"><h2>رسائل مركز العمليات <span class="device-inbox-count"></span></h2><div class="device-inbox-list" aria-live="polite"></div></section>');
+root.querySelector('.app').insertAdjacentHTML('beforeend', aiPanelHtml(prefix));
+root.querySelector('.app').appendChild(root.querySelector('.cnt'));
+setupAiPanel(root,prefix,device);
+var $=function(s){return root.querySelector(s)},al=$('.al'),go=$('.b2'),ts=$('.toast'),
+ns=device.stoppedCount||0,t,cur;
+var D={
+link:{fp:'9C2E',ty:'click',ti:'رابط احتيالي',tx:'أُوقف فتح الرابط قبل تحميل الصفحة.',rs:['الصفحة تحاكي بوابة الغرامات المرورية','تاريخ تسجيل النطاق حديث','مصدر الرسالة رقم غير معروف'],stop:'إغلاق الرابط',st:'أُغلق الرابط وأُرسلت إشارة مجهولة للمركز'},
+call:{fp:'VOIP',ty:'call',ti:'مكالمة جارية أثناء تحويل مالي',tx:'قد يكون طلب التحويل أثناء المكالمة محاولة احتيال. تم تعليق التحويل في هذا السيناريو.',rs:['مكالمة من رقم غير محفوظ','المبلغ ١٥٬٠٠٠ درهم أعلى من المعتاد','المستفيد جديد'],stop:'إلغاء التحويل',st:'أُلغي التحويل وأُرسلت إشارة مجهولة للمركز'},
+copy:{fp:'ACC7',ty:'copy',ti:'رقم الحساب نُسخ من محادثة',tx:'يُرجى التحقق من هوية صاحب الحساب قبل التحويل.',rs:['نسخ الرقم من تطبيق مراسلة قبل ٢٠ ثانية','الحساب مذكور في بلاغات سابقة','لا توجد تحويلات سابقة لهذا الحساب'],stop:'إيقاف التحويل',st:'أُوقف التحويل وأُرسلت إشارة مجهولة للمركز'}};
+function renderDeviceNotifications(){
+ var list=$('.device-inbox-list'),notifications=Array.isArray(device.notifications)?device.notifications:[];
+ list.innerHTML='';
+ var unread=notifications.filter(function(item){return !item.read}).length;
+ $('.device-inbox-count').textContent=unread?'· '+unread+' غير مقروء':'· '+notifications.length+' رسالة';
+ if(!notifications.length){var empty=document.createElement('p');empty.className='note';empty.textContent='لا توجد تنبيهات وصلت لهذا الجهاز.';list.appendChild(empty);return}
+ notifications.slice(0,20).forEach(function(item){
+  var card=document.createElement('article'),title=document.createElement('b'),message=document.createElement('p'),time=document.createElement('time');
+  card.className='device-inbox-item'+(item.read?'':' unread');
+  title.textContent='تنبيه أمني من مركز العمليات ·';
+  message.textContent=item.message;
+  time.textContent=new Date(item.timestamp).toLocaleString('ar-AE',{hour12:false});
+  card.appendChild(title);card.appendChild(message);card.appendChild(time);
+  if(!item.read){var button=document.createElement('button');button.type='button';button.className='btn alt';button.textContent='تمت القراءة';button.onclick=function(){item.read=true;notifyMockDatabase()};card.appendChild(button)}
+  list.appendChild(card);
+ });
+}
+root.renderDeviceNotifications=renderDeviceNotifications;
+function toast(m){ts.textContent=m;ts.classList.add('on');setTimeout(function(){ts.classList.remove('on')},3300)}
+var scanInput=root.querySelector('#'+inputId),scanButton=root.querySelector('#'+buttonId),scanStatus=root.querySelector('#'+statusId),scanSource=root.querySelector('#'+sourceId);
+function addText(parent,tag,text,className){var el=document.createElement(tag);el.textContent=text;if(className)el.className=className;parent.appendChild(el);return el}
+function renderScanResult(data){
+ var score=Number(data.risk_score||0),level=String(data.risk_level||'unknown');
+ var threat=score>=30||data.verdict==='confirmed_or_multiple_high_risk_signals';
+ var card=document.createElement('div');card.className='scan-result '+(threat?'danger':(level==='unknown'?'':'ok'));
+ addText(card,'b',(data.decision_ar||'اكتمل التحليل')+' · '+score+'/100');
+ addText(card,'p','مستوى الخطورة: '+({critical:'حرج',high:'مرتفع',medium:'متوسط',low:'منخفض',unknown:'غير محسوم'}[level]||level));
+ addText(card,'p','النطاق: '+String(data.registered_domain||data.hostname||'غير متاح'));
+ addText(card,'p','مصدر الرابط: '+({message:'رسالة أو رابط مباشر',search:'نتيجة بحث',maps:'خرائط أو نشاط تجاري',social:'منصة تواصل اجتماعي',other:'غير محدد'}[data.source]||data.source));
+ var brand=data.brand_impersonation||{};
+ if(brand.detected)addText(card,'p','اشتباه انتحال العلامة: '+String(brand.brand||'علامة غير محددة'));
+ else if(data.verified_official_domain)addText(card,'p','مطابقة نطاق رسمي مُدرج: '+String(data.verified_official_domain));
+ if((data.indicators||[]).length){var list=document.createElement('ul');(data.indicators||[]).forEach(function(ind){addText(list,'li',String(ind.label||ind.code)+': '+String(ind.detail||''))});card.appendChild(list)}
+ if(!(data.indicators||[]).length)addText(card,'p','لم تظهر مؤشرات قوية في الفحوص المتاحة. هذا لا يؤكد أن الرابط آمن.');
+ if(data.shortened_url)addText(card,'p','تنبيه: رابط مختصر، والوجهة النهائية لم تُفتح أو تُحلّل تلقائياً.');
+ addText(card,'p','رقم الحالة: '+String(data.case_id||'—')+' · '+String(data.analysis_timestamp_utc||''));
+ addText(card,'p','سُجّل الدليل الكامل (SHA-256 والتصدير) في مركز العمليات.');
+ var caveat=document.createElement('p');caveat.textContent='ملاحظة: لم يتم فتح الموقع. الروابط المختصرة والتحويلات الخارجية قد تحتاج فحصاً إضافياً، وغياب التطابق مع قواعد التهديدات لا يعني أن الرابط آمن.';card.appendChild(caveat);
+ scanStatus.innerHTML='';scanStatus.appendChild(card);
+}
+function scanUrl(){
+ if(!device.enabled){scanStatus.textContent='يلزم تشغيل الجهاز التجريبي أولاً.';return}
+ var url=scanInput.value.trim();if(!url){scanStatus.textContent='يُرجى إدخال رابط أولاً.';return}
+ var startedAt=Date.now(),source=scanSource.value,generation=device.generation,deviceName=device.name,location=device.location;
+ scanButton.disabled=true;scanButton.textContent='جارٍ التحليل…';scanStatus.textContent='يتم تحليل الرابط دون فتح الموقع.';
+ fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url,source:source})})
+ .then(function(r){return r.json().then(function(d){if(!r.ok||d.error)throw new Error(d.error||'تعذر التحليل');return d})})
+ .then(function(data){
+  if(generation!==device.generation){scanStatus.textContent='أُلغيت النتيجة بعد إعادة ضبط الجهاز.';return}
+  renderScanResult(data);
+  var score=Number(data.risk_score||0),level=String(data.risk_level||'unknown'),flagged=score>=30||level==='high'||level==='critical'||data.verdict==='confirmed_or_multiple_high_risk_signals';
+  recordDeviceReport(device,{category:flagged?'suspicious':'security',subject:url,source:source,threatType:'فحص رابط · '+String((data.indicators&&data.indicators[0]&&data.indicators[0].label)||'تحليل أمني'),riskLevel:level,riskScore:score,resultSummary:String(data.decision_ar||data.verdict||'اكتمل الفحص'),status:'اكتمل فحص الرابط',responseSeconds:(Date.now()-startedAt)/1000,autoWarning:flagged,evidenceSha256:data.evidence_sha256,evidence:data,deviceName:deviceName,location:location});
+ }).catch(function(e){
+  if(generation!==device.generation){scanStatus.textContent='أُلغيت النتيجة بعد إعادة ضبط الجهاز.';return}
+  scanStatus.textContent='تعذر تحليل الرابط: '+e.message;
+  recordDeviceReport(device,{category:'security',subject:url,source:source,threatType:'فشل فحص رابط',riskLevel:'unknown',resultSummary:e.message,status:'تعذر إكمال الفحص',responseSeconds:(Date.now()-startedAt)/1000,deviceName:deviceName,location:location});
+ }).finally(function(){scanButton.disabled=!device.enabled;scanButton.textContent='تحليل الرابط'});
+}
+scanButton.addEventListener('click',scanUrl);
+scanInput.addEventListener('keydown',function(e){if(e.key==='Enter')scanUrl()});
+function open(o){
+ $('.tp').textContent=o.tp;$('h2',root).textContent;root.querySelector('.al h2').textContent=o.ti;$('.tx').textContent=o.tx;
+ $('.why ul').innerHTML=o.rs.map(function(r){return '<li>'+r+'</li>'}).join('');$('.b1').textContent=o.stop;
+ al.classList.toggle('bc',o.bc);al.classList.remove('shake');void al.offsetWidth;al.classList.add('on','shake');
+ try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+ clearInterval(t);
+ if(o.bc){go.style.display='none'}else{go.style.display='block';go.disabled=true;var c=5;go.textContent='متابعة على مسؤوليتي ('+c+')';t=setInterval(function(){c--;if(c<=0){clearInterval(t);go.disabled=false;go.textContent='متابعة على مسؤوليتي'}else go.textContent='متابعة على مسؤوليتي ('+c+')'},1000)}
+}
+function show(k,subject){
+ if(!device.enabled){toast('يلزم تشغيل الجهاز التجريبي أولاً.');return}
+ cur=D[k];
+ var report=recordDeviceReport(device,{category:'security',subject:subject||cur.tx,source:'phone_demo_scenario',threatType:'سيناريو توعوي · '+cur.ti,riskLevel:'medium',resultSummary:'بدأ السيناريو التوضيحي',status:'سيناريو توعوي قيد التجربة'});
+ cur.reportId=report.id;
+ open({tp:'تنبيه أمني فوري ·',ti:cur.ti,tx:cur.tx,rs:cur.rs,stop:cur.stop});
+}
+root.querySelectorAll('.sc').forEach(function(b){b.onclick=function(){show(b.dataset.k)}});
+root.querySelector('.lk').onclick=function(e){e.preventDefault();show('link',root.querySelector('.lk').textContent)};
+$('.b1').onclick=function(){clearInterval(t);al.classList.remove('on');
+ ns++;$('.ns').textContent=ns;markReportPrevented(cur.reportId,device);toast(cur.st)};
+go.onclick=function(){if(go.disabled)return;al.classList.remove('on');markReportContinued(cur.reportId,device);toast('تمت متابعة السيناريو وسُجّل ذلك للمراجعة.')};
+root.stopPhoneAlert=function(){clearInterval(t);al.classList.remove('on')};
+root.resetPhoneData=function(){
+ clearInterval(t);al.classList.remove('on');ts.classList.remove('on');cur=null;
+ root.querySelectorAll('.app input,.app textarea').forEach(function(control){control.value=''});
+ root.querySelectorAll('.scan-status').forEach(function(output){output.innerHTML=''});
+ scanSource.value='message';root.querySelector('#'+prefix+'AiSource').value='message';
+ scanButton.textContent='تحليل الرابط';root.querySelector('#'+prefix+'AiButton').textContent='تحليل بالذكاء الاصطناعي';$('.ns').textContent='0';
+};
+}
+
+/* ---------- نسخة الكمبيوتر: مركز العمليات ---------- */
+function center(root){
+root.innerHTML='<div class="card"><div class="soc-header"><div><h1>مركز العمليات الأمنية</h1><p class="note">عرض محلي لنشاط النسخ التجريبية المستخدمة فعلياً. لا توجد اتصالات بأجهزة حقيقية.</p></div><span class="soc-demo">أجهزة تجريبية · قاعدة محلية</span></div><div class="soc-updated" role="status" aria-live="polite"></div></div>'+
+'<div class="card"><div class="kp"><div><b class="soc-kpi-signals">0</b><span>فحوصات وبلاغات فعلية من النسخ</span></div><div><b class="soc-kpi-alerts">0</b><span>نتائج عالية الخطورة</span></div><div><b class="soc-kpi-saved">0</b><span>سيناريوهات أُوقفت يدوياً</span></div></div></div>'+
+'<div class="card"><h2>نسخ الأجهزة الخمس</h2><p class="note">التشغيل هنا حالة محلية للنسخة فقط، ولا ينشئ نشاطاً أو بلاغاً.</p><div class="soc-devices"></div></div>'+
+'<div class="card"><div class="soc-tabs" role="tablist" aria-label="أقسام مركز العمليات"><button type="button" class="btn alt soc-tab" id="soc-tab-suspicious" role="tab" aria-selected="true" aria-controls="soc-panel-suspicious">المواقع المشبوهة</button><button type="button" class="btn alt soc-tab" id="soc-tab-security" role="tab" aria-selected="false" aria-controls="soc-panel-security">الأمن ونتائج الفحص الأخرى</button></div><div class="soc-controls"><input class="soc-search" type="search" placeholder="بحث في الرابط أو الرسالة أو الجهاز أو الموقع" aria-label="البحث في البلاغات"><select class="soc-severity-filter" aria-label="تصفية حسب الخطورة"><option value="all">كل مستويات الخطورة</option><option value="critical">حرج</option><option value="high">مرتفع</option><option value="medium">متوسط</option><option value="low">منخفض</option><option value="unknown">غير محسوم</option></select><button type="button" class="btn alt soc-export-all">تصدير نتائج الفحص بصيغة CSV</button></div>'+
+'<section class="soc-panel" id="soc-panel-suspicious" role="tabpanel" aria-labelledby="soc-tab-suspicious"><h2>المواقع والرسائل المشبوهة <span class="note soc-count-suspicious"></span></h2><div class="soc-table-wrap"><table class="soc-table"><thead><tr><th>رقم البلاغ / المصدر</th><th>الرابط أو الرسالة</th><th>المنطقة</th><th>النتيجة / مستوى الخطورة</th><th>الجهاز</th><th>وقت الفحص</th><th>الحالة</th><th>الدليل</th></tr></thead><tbody class="soc-reports-suspicious"></tbody></table></div></section>'+
+'<section class="soc-panel" id="soc-panel-security" role="tabpanel" aria-labelledby="soc-tab-security" hidden><h2>الأمن ونتائج الفحص الأخرى <span class="note soc-count-security"></span></h2><div class="soc-table-wrap"><table class="soc-table"><thead><tr><th>رقم البلاغ / المصدر</th><th>الرابط أو الرسالة</th><th>المنطقة</th><th>النتيجة / مستوى الخطورة</th><th>الجهاز</th><th>وقت الفحص</th><th>الحالة</th><th>الدليل</th></tr></thead><tbody class="soc-reports-security"></tbody></table></div></section></div>'+
+'<div class="card"><h2>بث أمني يدوي تجريبي</h2><p class="note">يوصل التنبيه داخل واجهة النسخ النشطة والمستهدفة في هذه الصفحة فقط. لا يصل إلى هاتف فعلي خارج المتصفح.</p><div class="soc-broadcast"><label>نطاق الاستهداف<select class="soc-target-scope"><option value="all">كل النسخ التجريبية النشطة</option><option value="region">منطقة محددة</option><option value="device">جهاز محدد</option></select></label><label class="soc-target-value-wrap" hidden>المنطقة أو الجهاز<select class="soc-target-value"></select></label><label class="wide">نص التنبيه<textarea class="soc-broadcast-message" maxlength="240" placeholder="نص التنبيه المراد إرساله إلى النسخ النشطة"></textarea></label><div class="wide"><button type="button" class="btn soc-broadcast-btn">إرسال للهواتف التجريبية</button></div><div class="wide soc-broadcast-status" role="status" aria-live="polite">لم يصل أي تنبيه بعد.</div></div><h3>سجل البث التجريبي</h3><div class="soc-broadcast-log note"></div></div>'+
+'<div class="card"><p class="note">تُنشأ السجلات فقط بعد فحص رابط أو محتوى أو تشغيل سيناريو توعوي في جهاز نشط. البيانات التجريبية محفوظة في هذا المتصفح ويمكن إعادة ضبط كل جهاز من لوحة الهاتف.</p></div>';
+var $=function(selector){return root.querySelector(selector)};
+function addCell(row,text,className){var cell=document.createElement('td');cell.textContent=text==null?'':String(text);if(className)cell.className=className;row.appendChild(cell);return cell}
+function riskLabel(level){return ({critical:'حرج',high:'مرتفع',medium:'متوسط',low:'منخفض',uncertain:'غير محسوم',unknown:'غير محسوم'})[level]||level||'غير محسوم'}
+function sourceLabel(source){return ({message:'رسالة أو رابط مباشر',search:'نتيجة بحث',maps:'خرائط',social:'تواصل اجتماعي',other:'أخرى',phone_demo_scenario:'سيناريو توعوي',ai_message:'تحليل محتوى بالذكاء الاصطناعي',ai_webpage:'تحليل صفحة بالذكاء الاصطناعي',ai_search_ad:'تحليل إعلان بالذكاء الاصطناعي',ai_maps_listing:'تحليل نشاط بالذكاء الاصطناعي',ai_other:'تحليل محتوى بالذكاء الاصطناعي'})[source]||source}
+function renderDevices(){
+ var list=$('.soc-devices');list.innerHTML='';
+ mockDatabase.devices.forEach(function(device){
+  var card=document.createElement('div'),title=document.createElement('b'),detail=document.createElement('span'),state=document.createElement('span');
+  card.className='soc-campaign';title.textContent=device.name;
+  detail.textContent='المنطقة: '+device.location+' · الفحوص المسجلة: '+device.activityCount;
+  state.textContent=device.enabled?'قيد الاستخدام محلياً':'متوقف';
+  state.className='soc-device-state '+(device.enabled?'active':'');
+  card.appendChild(title);card.appendChild(detail);card.appendChild(state);list.appendChild(card);
+ });
+}
+function renderRows(category,bodySelector,countSelector){
+ var query=$('.soc-search').value.trim().toLowerCase(),severity=$('.soc-severity-filter').value;
+ var matches=mockDatabase.reports.filter(function(report){
+  var searchText=[report.id,report.deviceId,report.deviceName,report.location,report.subject,report.threatType,report.resultSummary,sourceLabel(report.source)].join(' ').toLowerCase();
+  return report.category===category&&(!query||searchText.indexOf(query)!==-1)&&(severity==='all'||report.riskLevel===severity);
+ });
+ var body=$(bodySelector);body.innerHTML='';$(countSelector).textContent='('+matches.length+' بلاغ)';
+ if(!matches.length){var empty=document.createElement('tr'),cell=addCell(empty,'لا توجد بلاغات مطابقة بعد. يُرجى استخدام نسخة هاتف نشطة لإجراء فحص.');cell.colSpan=8;body.appendChild(empty);return}
+ matches.forEach(function(report){
+  var row=document.createElement('tr'),reference=document.createElement('td'),caseId=document.createElement('small');
+  caseId.className='note';caseId.textContent=report.id+' · تجريبي';reference.appendChild(caseId);reference.appendChild(document.createElement('br'));reference.appendChild(document.createTextNode(sourceLabel(report.source)));row.appendChild(reference);
+  addCell(row,report.subject,'soc-link');addCell(row,report.location);
+  var resultCell=addCell(row,report.threatType+' · '+riskLabel(report.riskLevel)+(report.riskScore===null?'':' · '+report.riskScore+'/100'),'soc-risk '+(['critical','high','medium','low'].indexOf(report.riskLevel)!==-1?report.riskLevel:''));
+  var summary=document.createElement('small');summary.className='note';summary.textContent=report.resultSummary;resultCell.appendChild(document.createElement('br'));resultCell.appendChild(summary);
+  addCell(row,report.deviceName);
+  addCell(row,new Date(report.discoveredAt).toLocaleString('ar-AE',{hour12:false}));
+  addCell(row,report.prevented?'أُوقف السيناريو يدوياً':report.status);
+  var evCell=document.createElement('td');
+  if(report.evidence&&report.evidenceType==='ai_json'){
+   var aiNote=document.createElement('small');aiNote.className='note';aiNote.textContent='تحليل بالذكاء الاصطناعي';
+   var jb=document.createElement('button');jb.type='button';jb.className='btn alt';jb.textContent='تصدير ملف JSON';
+   jb.onclick=function(){exportJsonData(report.evidence,'scamshield_ai_'+report.id+'.json')};
+   evCell.appendChild(aiNote);evCell.appendChild(document.createElement('br'));evCell.appendChild(jb);
+  }else if(report.evidenceSha256&&report.evidence){
+   var hash=document.createElement('small');hash.className='note soc-link';
+   hash.textContent='SHA-256: '+report.evidenceSha256;
+   var exp=document.createElement('button');exp.type='button';exp.className='btn alt';exp.textContent='تصدير ملف CSV';
+   exp.onclick=function(){exportCsvResults([report.evidence])};
+   evCell.appendChild(hash);evCell.appendChild(document.createElement('br'));evCell.appendChild(exp);
+  }else evCell.textContent='—';
+  row.appendChild(evCell);
+  body.appendChild(row);
+ });
+}
+function renderStats(){
+ var reports=mockDatabase.reports;
+ $('.soc-kpi-signals').textContent=reports.length;
+ $('.soc-kpi-alerts').textContent=reports.filter(function(report){return report.autoWarning}).length;
+ $('.soc-kpi-saved').textContent=reports.filter(function(report){return report.prevented}).length;
+ $('.soc-updated').textContent=reports.length?'آخر نشاط مسجل: '+new Date(reports[0].discoveredAt).toLocaleString('ar-AE',{hour12:false}):'لا يوجد نشاط مسجل حتى الآن.';
+}
+function refreshTargets(){
+ var scope=$('.soc-target-scope'),wrap=$('.soc-target-value-wrap'),target=$('.soc-target-value'),previous=target.value;
+ wrap.hidden=scope.value==='all';target.innerHTML='';
+ var values=scope.value==='region'?mockDatabase.devices.map(function(device){return {value:device.location,label:device.location}}).filter(function(item,index,array){return array.findIndex(function(candidate){return candidate.value===item.value})===index}):scope.value==='device'?mockDatabase.devices.map(function(device){return {value:device.id,label:device.name}}):[];
+ values.forEach(function(item){var option=document.createElement('option');option.value=item.value;option.textContent=item.label;target.appendChild(option)});
+ if(values.some(function(item){return item.value===previous}))target.value=previous;
+}
+function renderBroadcasts(){
+ var log=$('.soc-broadcast-log');log.innerHTML='';
+ if(!mockDatabase.broadcasts.length){log.textContent='لا توجد عمليات بث تجريبية.';return}
+ mockDatabase.broadcasts.slice(0,10).forEach(function(item){var entry=document.createElement('div');entry.className='ev';entry.textContent=new Date(item.timestamp).toLocaleString('ar-AE',{hour12:false})+' · '+item.target+' · '+item.message+' · وصل داخل المحاكاة إلى '+item.deliveredCount+' جهاز نشط'+(item.skippedCount?' · تم تجاوز '+item.skippedCount+' جهاز متوقف':'')+' · لا يوجد إرسال خارجي.';log.appendChild(entry)});
+}
+function render(){renderDevices();renderStats();renderRows('suspicious','.soc-reports-suspicious','.soc-count-suspicious');renderRows('security','.soc-reports-security','.soc-count-security');refreshTargets();renderBroadcasts()}
+root.querySelectorAll('.soc-tab').forEach(function(tab){
+ tab.addEventListener('click',function(){
+  root.querySelectorAll('.soc-tab').forEach(function(item){item.setAttribute('aria-selected',item===tab?'true':'false')});
+  root.querySelectorAll('.soc-panel').forEach(function(panel){panel.hidden=panel.id!==tab.getAttribute('aria-controls')});
+ });
+});
+$('.soc-search').addEventListener('input',function(){renderRows('suspicious','.soc-reports-suspicious','.soc-count-suspicious');renderRows('security','.soc-reports-security','.soc-count-security')});
+$('.soc-severity-filter').addEventListener('change',function(){renderRows('suspicious','.soc-reports-suspicious','.soc-count-suspicious');renderRows('security','.soc-reports-security','.soc-count-security')});
+$('.soc-export-all').addEventListener('click',function(){
+ var items=mockDatabase.reports.filter(function(r){return r.evidence&&r.evidenceType!=='ai_json'}).map(function(r){return r.evidence});
+ if(!items.length){alert('لا توجد نتائج فحص روابط للتصدير بعد.');return}
+ exportCsvResults(items);
+});
+$('.soc-target-scope').addEventListener('change',refreshTargets);
+$('.soc-broadcast-btn').addEventListener('click',function(){
+ var message=$('.soc-broadcast-message').value.trim(),scope=$('.soc-target-scope').value,targetValue=scope==='all'?'':$('.soc-target-value').value,target=scope==='all'?'كل النسخ التجريبية النشطة':scope==='device'?$('.soc-target-value').selectedOptions[0].textContent:targetValue;
+ if(!message){$('.soc-broadcast-status').textContent='يُرجى كتابة نص التنبيه التجريبي أولاً.';return}
+ if(scope!=='all'&&!targetValue){$('.soc-broadcast-status').textContent='يُرجى تحديد منطقة أو جهاز.';return}
+ var matched=mockDatabase.devices.filter(function(device){return scope==='all'||(scope==='region'&&device.location===targetValue)||(scope==='device'&&device.id===targetValue)}),recipients=matched.filter(function(device){return device.enabled}),timestamp=new Date().toISOString();
+ recipients.forEach(function(device){device.notifications.unshift({id:'MOCK-MESSAGE-'+String(mockDatabase.nextNotification++).padStart(5,'0'),message:message,timestamp:timestamp,read:false});device.notifications=device.notifications.slice(0,50)});
+ var item={timestamp:timestamp,target:target,message:message,deliveredCount:recipients.length,skippedCount:matched.length-recipients.length};
+ mockDatabase.broadcasts.unshift(item);notifyMockDatabase();
+ $('.soc-broadcast-status').textContent=recipients.length?'وصل التنبيه داخل المحاكاة إلى '+recipients.length+' جهاز نشط'+(item.skippedCount?'، وتم تجاوز '+item.skippedCount+' جهاز متوقف':'')+'. لا يصل إلى هاتف فعلي خارج المتصفح.':matched.length?'لم يصل التنبيه؛ لا توجد أجهزة نشطة ضمن النطاق. يلزم تشغيل الأجهزة المستهدفة أولاً.':'لم يصل التنبيه؛ لا توجد أجهزة ضمن النطاق المحدد.';
+});
+subscribeMockDatabase(render);
+render();
+}
+
+if(view!=='police')phone(document.getElementById('ph'));
+if(view!=='phone')center(document.getElementById('ct'));
+})();
+</script>
+</body>
+</html>
